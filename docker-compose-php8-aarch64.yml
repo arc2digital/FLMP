@@ -1,0 +1,46 @@
+networks:
+  web-network:
+services:
+
+  frankenphp:
+    build:
+      context: .
+      dockerfile: frankenphp/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+      - "2019:2019"  # for FrankenPHP status page
+      - "9004:9003"  # For Xdebug
+
+    volumes:
+      - ./frankenphp/data:/data
+      - ./frankenphp/config:/config
+      - ./frankenphp/php.d:/etc/php.d
+      - ./frankenphp/Caddyfile:/etc/frankenphp/Caddyfile
+      - ./frankenphp/logs:/var/log/caddy
+      - ./frankenphp/certificates:/root/.local/share/caddy/certificates
+      - ./frankenphp/pki:/root/.local/share/caddy/pki
+      - ./app:/var/www/html
+    networks:
+      - web-network
+    extra_hosts:
+      host.docker.internal: host-gateway
+
+  mysql:
+    image: mysql/mysql-server:8.0-aarch64
+    restart: on-failure
+    ports:
+      - "23306:3306"
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: <custom_db_name>
+      MYSQL_USER: <custom_db_user>
+      MYSQL_PASSWORD: <custom_db_password>
+    volumes:
+      - $PWD/db/data:/var/lib/mysql
+    networks:
+      - web-network
+    extra_hosts:
+      host.docker.internal: host-gateway

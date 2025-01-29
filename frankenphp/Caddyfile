@@ -1,0 +1,36 @@
+{
+    # Enable FrankenPHP
+    frankenphp
+
+    # Logging
+    log {
+        output stderr
+        level DEBUG
+    }
+
+    debug
+}
+fe.dev.localhost {
+    reverse_proxy host.docker.internal:8080
+}
+be.dev.localhost {
+    # Enable compression (optional)
+    encode zstd br gzip
+
+    # Route everything to webroot (ignores the root index.php, which is fine)
+    root * /var/www/html/be/webroot
+
+    # Allow access to .env (optional, for debugging purposes)
+    # @env path /config/.env
+    # file_server @env {
+    #     root /var/www/html/be
+    # }
+
+    # Security: Hide specific paths
+    @hide path .env *.sql *.template
+    respond @hide 404
+
+    # Execute PHP files
+    php_server
+
+}

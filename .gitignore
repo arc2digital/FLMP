@@ -1,0 +1,12 @@
+caddy/config
+caddy/data
+caddy/logs
+frankenphp/certificates
+frankenphp/config
+frankenphp/data
+frankenphp/logs
+frankenphp/pki
+db
+mnr
+php/db
+php/tmp
